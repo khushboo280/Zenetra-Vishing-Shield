@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vishing Shield</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+<script>
+(function(){try{var p=JSON.parse(localStorage.getItem('vs.prefs')||'null')||{};var r=document.documentElement;r.dataset.mode=p.mode||'light';r.dataset.palette=p.palette||'mist';r.dataset.motion=p.motion===false?'off':'on';}catch(e){var r=document.documentElement;r.dataset.mode='light';r.dataset.palette='mist';}})();
+</script>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><i></i><i></i></div>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="logo" data-i="shield"></div><div><b>Vishing Shield</b><small>CALL GUARD · PROTOTYPE</small></div></div>
+    <nav class="nav" id="nav" aria-label="Main">
+      <button data-view="live" aria-current="page"><span data-i="live"></span>Live call</button>
+      <button data-view="history"><span data-i="history"></span>History</button>
+      <button data-view="how"><span data-i="book"></span>How it works</button>
+      <button data-view="settings"><span data-i="settings"></span>Settings</button>
+    </nav>
+    <div class="side-foot"><b><span class="pulse"></span>Engine online</b>AI reads every call as it happens. Nothing here is simulated.</div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <h1 id="vt">Live call<small id="vs"></small></h1>
+      <div class="tools">
+        <button class="ibtn" id="modeBtn" aria-label="Switch between light and dark mode" title="Light / dark"></button>
+        <button class="ibtn" id="palBtn" aria-label="Choose a theme" aria-haspopup="true" aria-expanded="false" title="Themes"><span class="swatch"></span></button>
+        <div class="pop" id="pop" role="dialog" aria-label="Appearance">
+          <h3>Mode</h3>
+          <div class="seg" id="popMode" style="width:100%;display:flex"></div>
+          <h3 style="margin-top:14px">Theme</h3>
+          <div class="pal-grid" id="popPal"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- LIVE -->
+    <section class="view on" id="v-live">
+      <div class="panel callbar">
+        <div class="who">
+          <div class="avatar" id="avatar" data-i="phone"></div>
+          <div style="min-width:0"><b id="cNum">Not connected</b><small id="cMeta"></small></div>
+        </div>
+        <div class="livetag off" id="liveTag"><i></i><span>READY</span></div>
+        <div class="timer num" id="timer">00:00.0</div>
+        <div class="tools">
+          <span class="chip" id="aiChip" title="AI is the scoring engine">AI: waiting</span>
+          <span class="chip" id="sttChip" title="Speech-to-text engine">Speech: —</span>
+          <span class="chip" id="netChip" title="STUN / TURN servers used for the call">Network: —</span>
+          <button class="btn pri" id="bStart"></button>
+        </div>
+      </div>
+      <div class="panel conn" id="conn" hidden>
+        <div class="conn-code"><small>Room code</small><b id="roomCode">----</b></div>
+        <div class="conn-link"><small>Send this link to the caller (any phone or computer, anywhere)</small><input id="roomLink" readonly aria-label="Caller link"></div>
+        <div class="conn-qr"><img id="roomQr" alt="QR code of the caller link" width="132" height="132"><small>Scan with the phone camera</small></div>
+        <button class="btn" id="copyLink">Copy link</button>
+      </div>
+
+      <div class="grid">
+        <div class="stack">
+          <div class="panel phone-panel">
+            <h2>Your phone <span class="sp"></span><span class="chip" id="phoneChip">receiver</span></h2>
+            <div class="phone-wrap" id="phoneHost"></div>
+          </div>
+          <div class="panel testbox" id="testPanel">
+            <h2>Upload voice <span class="sp"></span><span class="chip" id="testChip">test mode</span></h2>
+            <p class="hint">No second phone? Upload one recording of the whole call and run the check on it: speech-to-text, AI observer, voice alert. Nothing is simulated.</p>
+            <label class="tf"><span>Call recording (caller + receiver)</span><input type="file" id="fCall" accept="audio/*,.wav,.mp3,.m4a,.ogg,.webm"></label>
+            <div class="tf2">
+              <label class="tf"><span>Caller is</span><select id="fKind"><option value="unknown">Unknown number</option><option value="saved">Saved contact</option></select></label>
+              <label class="tf"><span>Who is who</span><select id="fFirst"><option value="auto">Auto (API3)</option><option value="caller">1st voice = caller</option><option value="receiver">1st voice = receiver</option></select></label>
+            </div>
+            <button class="btn pri" id="bTest" disabled>Run test</button>
+            <div class="hint" id="testMsg" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h2>Conversation <span class="sp"></span><span class="chip acc" id="langChip">Alert language · English</span>
+              <button class="btn sm" id="bPdf" disabled title="Download the whole conversation as a PDF"><span data-i="download"></span>Download transcript</button></h2>
+            <div class="lanes">
+              <div class="lane caller" id="laneC">
+                <div class="lane-h"><span class="dot"></span>Caller<span class="sp"></span><span class="chip" id="cSpoof">Synthetic voice 0%</span></div>
+                <canvas id="wC" aria-hidden="true"></canvas>
+              </div>
+              <div class="lane receiver" id="laneR">
+                <div class="lane-h"><span class="dot"></span>Receiver (you)<span class="sp"></span><span class="chip" id="rState">Listening</span></div>
+                <canvas id="wR" aria-hidden="true"></canvas>
+              </div>
+            </div>
+            <div class="diag" id="diag" aria-label="Audio and transcript health"></div>
+            <div class="msgs tall" id="msgs" aria-live="polite"></div>
+            <div class="whisper" id="whisper"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span><span id="whisperTxt"></span></div>
+          </div>
+          <div class="panel">
+            <h2>Evidence found <span class="sp"></span><span class="chip" id="evCount">0 cues</span></h2>
+            <div class="ev empty" id="ev">When AI notices something worrying, the exact words appear here with the reason.</div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="panel">
+            <h2>Fraud confidence <span class="sp"></span><span class="state-pill" id="pill">SAFE</span></h2>
+            <div class="gauge-wrap">
+              <svg class="gauge" id="gauge" viewBox="0 0 300 186" role="img" aria-label="Fraud confidence gauge">
+                <g id="gZones"></g>
+                <path class="track" d="M30 160A120 120 0 0 1 270 160" stroke-width="16" pathLength="100"/>
+                <path class="val" id="gVal" d="M30 160A120 120 0 0 1 270 160" stroke-width="16" pathLength="100" stroke-dasharray="0 100"/>
+                <circle class="halo" id="gHalo" r="15" cx="30" cy="160"/>
+                <circle class="knob" id="gKnob" r="9" cx="30" cy="160"/>
+                <text class="big" id="gNum" x="150" y="136" text-anchor="middle">0</text>
+                <text class="cap" x="150" y="162" text-anchor="middle">Fraud confidence %</text>
+              </svg>
+            </div>
+            <div class="ladder" id="ladder"></div>
+            <div class="stages" id="stages"></div>
+          </div>
+          <div class="panel">
+            <h2>Live scoreboard <span class="sp"></span><span class="chip good"><span class="pulse"></span>8 signals · every 0.25 s</span></h2>
+            <div class="sb" id="sb"></div>
+            <div class="engine" id="engine"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel fusion" id="fusionPanel">
+        <h2>Live Fusion <span class="sp"></span><span class="chip" id="fusChip">how the score is built</span></h2>
+        <div class="fus" id="fus"></div>
+      </div>
+
+      <div class="bottom">
+        <div class="panel">
+          <h2>Risk timeline <span class="sp"></span><span class="chip good" id="tlChip">Safe</span></h2>
+          <div class="tl-wrap"><canvas id="tl" aria-label="How risky the call has been over time"></canvas></div>
+          <div class="tl-key"><span><i class="g"></i>Safe</span><span><i class="a"></i>Be careful</span><span><i class="r"></i>Danger</span><span class="tl-hint">Move over the line to see a moment</span></div>
+        </div>
+        <div class="panel logp">
+          <h2>Activity log <span class="sp"></span><span class="chip">what the guard is doing</span></h2>
+          <div class="log" id="log" role="log"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="view" id="v-history">
+      <div class="stats" id="stats"></div>
+      <div class="cols" style="grid-template-columns:minmax(0,1fr)">
+        <div class="panel"><h2>Peak fraud confidence per call <span class="sp"></span><button class="btn sm" id="clearHist">Clear my calls</button></h2><div class="hbars" id="hbars"></div></div>
+        <div class="panel"><h2>Calls</h2><div class="tbl" id="tbl"></div></div>
+      </div>
+    </section>
+
+    <!-- HOW -->
+    <section class="view" id="v-how">
+      <div class="panel how">
+        <h2>From a live call to a voice alert</h2>
+        <svg class="flow" viewBox="0 0 960 310" role="img" aria-label="Processing pipeline">
+          <defs></defs>
+          <path class="e" id="e1" d="M160 86C185 86 185 156 200 156"/>
+          <path class="e" id="e2" d="M160 226C185 226 185 156 200 156"/>
+          <path class="e" id="e3" d="M340 156H390"/>
+          <path class="e" id="e4" d="M560 156H620"/>
+          <path class="e" id="e5" d="M760 156H790"/>
+          <path class="e" id="e6" d="M865 182V246"/>
+          <path class="e" id="e7" d="M865 182C865 215 720 205 695 246"/>
+          <rect class="n" x="20" y="60" width="140" height="52" rx="13"/><text class="t" x="90" y="84" text-anchor="middle">Caller audio</text><text class="sub" x="90" y="101" text-anchor="middle">leg A</text>
+          <rect class="n" x="20" y="200" width="140" height="52" rx="13"/><text class="t" x="90" y="224" text-anchor="middle">Receiver audio</text><text class="sub" x="90" y="241" text-anchor="middle">leg B</text>
+          <rect class="n" x="200" y="130" width="140" height="52" rx="13"/><text class="t" x="270" y="154" text-anchor="middle">VAD + STT</text><text class="sub" x="270" y="171" text-anchor="middle">Hindi · English · Hinglish</text>
+          <rect class="n" x="390" y="40" width="170" height="232" rx="15"/><text class="t" x="475" y="68" text-anchor="middle">AI observer</text>
+          <text class="sub" x="475" y="104" text-anchor="middle">Intent · asks &amp; scam stages</text>
+          <text class="sub" x="475" y="132" text-anchor="middle">Manipulation · urgency, secrecy</text>
+          <text class="sub" x="475" y="160" text-anchor="middle">Sentiment · fear, warmth</text>
+          <text class="sub" x="475" y="188" text-anchor="middle">Hesitation · pauses, fillers</text>
+          <text class="sub" x="475" y="216" text-anchor="middle">Voice authenticity · deepfake</text>
+          <text class="sub" x="475" y="244" text-anchor="middle">Family bond · caller number</text>
+          <rect class="n" x="620" y="130" width="140" height="52" rx="13"/><text class="t" x="690" y="154" text-anchor="middle">Fusion</text><text class="sub" x="690" y="171" text-anchor="middle">logistic · 9 terms</text>
+          <rect class="n" x="790" y="130" width="150" height="52" rx="13"/><text class="t" x="865" y="154" text-anchor="middle">Alert engine</text><text class="sub" x="865" y="171" text-anchor="middle">hysteresis · known-caller rule</text>
+          <rect class="n" x="620" y="246" width="150" height="46" rx="13"/><text class="t" x="695" y="266" text-anchor="middle">Dashboard</text><text class="sub" x="695" y="282" text-anchor="middle">scores, evidence, log</text>
+          <rect class="n" x="790" y="246" width="150" height="46" rx="13"/><text class="t" x="865" y="266" text-anchor="middle">Live call</text><text class="sub" x="865" y="282" text-anchor="middle">warning to both sides</text>
+          <circle class="pk" r="4"><animateMotion dur="2.2s" repeatCount="indefinite"><mpath href="#e1"/></animateMotion></circle>
+          <circle class="pk" r="4"><animateMotion dur="2.2s" begin="0.7s" repeatCount="indefinite"><mpath href="#e2"/></animateMotion></circle>
+          <circle class="pk" r="4"><animateMotion dur="1.2s" begin="0.4s" repeatCount="indefinite"><mpath href="#e3"/></animateMotion></circle>
+          <circle class="pk" r="4"><animateMotion dur="1.4s" begin="0.8s" repeatCount="indefinite"><mpath href="#e4"/></animateMotion></circle>
+          <circle class="pk" r="4"><animateMotion dur="0.9s" begin="0.2s" repeatCount="indefinite"><mpath href="#e5"/></animateMotion></circle>
+          <circle class="pk" r="4"><animateMotion dur="1.1s" begin="0.5s" repeatCount="indefinite"><mpath href="#e6"/></animateMotion></circle>
+          <circle class="pk" r="4"><animateMotion dur="1.3s" begin="0.9s" repeatCount="indefinite"><mpath href="#e7"/></animateMotion></circle>
+        </svg>
+      </div>
+      <div class="cols" style="margin-top:16px">
+        <div class="panel how">
+          <h2>What this app does, and its limits</h2>
+          <ul class="kv">
+            <li><i>✓</i><span>Both voices travel over a real WebRTC call. Every spoken sentence is transcribed live and sent to AI, which reads the whole conversation like a quiet third person and scores it.</span></li>
+            <li><i>✓</i><span>People who genuinely know each other (family, friends) never trigger an alert, even when they talk about money or passwords. Only an unknown or suspicious caller who pushes for an OTP, PIN, app install or money does.</span></li>
+            <li><i>✓</i><span>An alert never ends your call. The warning plays (to you in your language, to the caller as a recorded voice), then the call carries on. Only the red End Call button ends it.</span></li>
+            <li><i class="sim">~</i><span>The synthetic-voice (deepfake) score stays low until you connect a voice-authenticity model. Speech-to-text can make mistakes, and AI can too: treat a warning as a prompt to be careful, not as proof.</span></li>
+            </ul>
+        </div>
+        <div class="panel how">
+          <h2>Fusion formula</h2>
+          <p style="margin-top:0">Every 0.25 s the signals (0–100) are combined into one fraud confidence:</p>
+          <p><code>F = 100 · σ( b + Σ wᵢ·scoreᵢ + w·stages − w·family )</code></p>
+          <div class="rule" id="wRule"></div>
+          <p style="font-size:13px;margin-bottom:0">Family warmth is discounted when the voice looks synthetic or when a hard ask is made, so a cloned voice cannot borrow trust.</p>
+        </div>
+        <div class="panel how">
+          <h2>When an alert fires</h2>
+          <div class="rule">
+            <b>WATCH ≥ 30</b><span>Quietly track; nothing is said.</span>
+            <b>WARN ≥ 55</b><span>Short whisper to the receiver only.</span>
+            <b>INTERVENE ≥ 80</b><span>Play the formal voice warning to each side. The call continues.</span>
+            <b>Hard rule</b><span>An unfamiliar caller asking for an OTP / PIN / CVV or a remote app, in a scam context, triggers at once.</span>
+            <b>Hysteresis</b><span>3 consecutive ticks to escalate, 6 to calm down: no flicker.</span>
+            <b>Trusted contact</b><span>Saved contacts need +10 more evidence.</span>
+            <b>Known callers</b><span>If AI sees that you two genuinely know each other, no alert is raised.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="v-settings">
+      <div class="set">
+        <div class="panel">
+          <h2>Appearance</h2>
+          <div class="setrow"><div><b>Mode</b><small>Light is the default. System follows your device.</small></div><div class="seg" id="setMode"></div></div>
+          <div class="setrow" style="display:block"><div style="margin-bottom:12px"><b>Theme</b><small>Pick the colour world you like. It works in both light and dark.</small></div><div class="pal-big" id="setPal"></div></div>
+          <div class="setrow"><div><b>Animations</b><small>Gauge motion, waveforms, highlights and glow.</small></div><button class="sw" role="switch" id="swMotion" aria-label="Animations"></button></div>
+        </div>
+        <div class="panel">
+          <h2>Alert behaviour</h2>
+          <div class="setrow"><div><b>Speak voice alerts</b><small>Uses your browser’s text-to-speech in the call language.</small></div><button class="sw" role="switch" id="swVoice" aria-label="Speak voice alerts"></button></div>
+          <div class="setrow"><div><b>Speech-to-text engine</b><small>Auto uses AI for both voices (needs quota). Browser uses Chrome / Edge speech recognition on each device (free).</small></div><div class="seg" id="setEngine"><button data-e="auto" aria-pressed="true">Auto (AI)</button><button data-e="browser" aria-pressed="false">Browser</button></div></div>
+          <div class="setrow"><div><b>Speech language</b><small>What you speak, for your own words. Pick Hindi for Hindi or Hinglish.</small></div><div class="seg" id="setStt"><button data-l="en-IN" aria-pressed="true">English</button><button data-l="hi-IN" aria-pressed="false">हिन्दी</button></div></div>
+          <div class="setrow"><div><b>Alert language</b><small>Auto follows the conversation.</small></div><div class="seg" id="setLang"><button data-l="auto" aria-pressed="true">Auto</button><button data-l="en" aria-pressed="false">English</button><button data-l="hi" aria-pressed="false">हिंदी</button></div></div>
+          <div class="setrow"><div><b>Trusted contacts need more evidence</b><small>Saved contacts get a +10 margin before escalating.</small></div><button class="sw" role="switch" id="swTrusted" aria-label="Trusted contact leniency"></button></div>
+          <div class="setrow"><div><b>Watch threshold</b><small>Start tracking quietly</small></div><div class="range"><span><span>Watch</span><span id="tvWatch">30</span></span><input type="range" id="rWatch" min="10" max="60" step="1"></div></div>
+          <div class="setrow"><div><b>Warn threshold</b><small>Whisper to the receiver</small></div><div class="range"><span><span>Warn</span><span id="tvWarn">55</span></span><input type="range" id="rWarn" min="30" max="85" step="1"></div></div>
+          <div class="setrow"><div><b>Intervene threshold</b><small>Play the voice warning to both sides</small></div><div class="range"><span><span>Intervene</span><span id="tvInt">80</span></span><input type="range" id="rInt" min="55" max="98" step="1"></div></div>
+        </div>
+        <div class="panel">
+          <h2>Data</h2>
+          <div class="setrow"><div><b>Call history</b><small>Kept only in this browser.</small></div><button class="btn sm" id="clearHist2">Clear my calls</button></div>
+          <div class="setrow"><div><b>Reset everything</b><small>Back to light mode, Mist theme and default thresholds.</small></div><button class="btn sm" id="resetAll">Reset settings</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="veil" id="ov" role="presentation"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

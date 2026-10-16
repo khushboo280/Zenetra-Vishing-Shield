@@ -1,0 +1,51 @@
+/* Smartphone in-call screen (receiver dashboard + caller page). The screen is always dark, like a real phone. */
+.phone-wrap{display:grid;place-items:center;padding:6px 0 2px}
+.phone{--bz:#0b0d12;position:relative;width:min(300px,100%);aspect-ratio:300/616;border-radius:46px;padding:9px;background:linear-gradient(145deg,#2a2f3a,#0b0d12 38%,#1b2029);box-shadow:0 0 0 1.5px #3a404d inset,0 28px 50px -18px rgba(8,12,24,.55),0 8px 18px -8px rgba(8,12,24,.4)}
+.phone-btn{position:absolute;width:3px;background:#2c313c;border-radius:2px}
+.pb-a{left:-2.5px;top:96px;height:28px}.pb-b{left:-2.5px;top:140px;height:52px}.pb-c{right:-2.5px;top:150px;height:70px}
+.phone-screen{position:relative;height:100%;border-radius:38px;overflow:hidden;color:#f3f5fa;background:radial-gradient(120% 70% at 50% -10%,#2b3a63 0%,#151b30 46%,#0b0f1d 100%);display:flex;flex-direction:column;isolation:isolate}
+.phone[data-role=caller] .phone-screen{background:radial-gradient(120% 70% at 50% -10%,#3b2e5e 0%,#1a1630 46%,#0c0a1a 100%)}
+.p-island{position:absolute;top:9px;left:50%;width:92px;height:26px;border-radius:20px;background:#000;transform:translateX(-50%);z-index:5}
+.p-status{display:flex;justify-content:space-between;align-items:center;padding:13px 24px 0 26px;font-size:13px;z-index:4;height:42px}
+.p-sys{display:flex;gap:5px;align-items:center}
+.p-main{flex:1;display:flex;flex-direction:column;padding:6px 16px 18px;min-height:0}
+.p-id{text-align:center;padding-top:14px}
+.p-avatar{position:relative;width:84px;height:84px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(145deg,#6c8cff,#8b5cf6);display:grid;place-items:center;font:700 28px var(--f-head,inherit);box-shadow:0 10px 24px -8px rgba(108,140,255,.7)}
+.p-ini{position:relative;z-index:1}
+.p-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(255,255,255,.35);opacity:0}
+.phone[data-state=connected] .p-ring{animation:pring 2.4s ease-out infinite}.phone[data-state=connected] .p-ring.r2{animation-delay:1.2s}
+@keyframes pring{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.45);opacity:0}}
+.p-name{margin:0;font:600 23px var(--f-head,inherit);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-num{margin-top:3px;font-size:13px;color:#aab3cc}
+.p-state{margin-top:6px;font:500 15px var(--f-mono,monospace);color:#cfd6ea;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.p-guard{display:flex;align-items:center;gap:8px;justify-content:center;margin:12px auto 0;padding:6px 12px;border-radius:99px;font-size:11.5px;font-weight:600;background:rgba(255,255,255,.09);backdrop-filter:blur(8px);max-width:100%}
+.p-guard .gd{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:gdp 1.8s infinite;flex:none}
+.p-guard[data-level="1"] .gd{background:#60a5fa}.p-guard[data-level="2"] .gd{background:#fbbf24}.p-guard[data-level="3"] .gd{background:#f87171}
+@keyframes gdp{0%{box-shadow:0 0 0 0 currentColor}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.p-guard .gd{color:rgba(255,255,255,.5)}
+.p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 8px;margin-top:auto;padding:0 6px}
+.pbtn{display:grid;justify-items:center;gap:6px;background:none;border:0;color:#e9edf8;font:500 11.5px var(--f-body,inherit);cursor:pointer;padding:0;text-transform:lowercase}
+.pbtn i{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);transition:background .2s,transform .15s,color .2s}
+.pbtn:hover:not(:disabled) i{background:rgba(255,255,255,.2)}.pbtn:active:not(:disabled) i{transform:scale(.92)}
+.pbtn.on i{background:#f3f5fa;color:#10162a}
+.pbtn:disabled{opacity:.38;cursor:not-allowed}
+.pbtn:focus-visible,.pkey:focus-visible,.p-end:focus-visible,.p-hide:focus-visible{outline:2px solid #93b4ff;outline-offset:3px;border-radius:14px}
+.p-pad{margin-top:auto}.p-digits{min-height:30px;text-align:center;font:500 24px var(--f-mono,monospace);letter-spacing:.06em;margin-bottom:8px;overflow:hidden;white-space:nowrap}
+.p-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 10px;padding:0 14px}
+.pkey{height:50px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#f3f5fa;display:grid;align-content:center;justify-items:center;cursor:pointer;transition:background .15s,transform .1s}
+.pkey:hover{background:rgba(255,255,255,.2)}.pkey:active{transform:scale(.94);background:rgba(255,255,255,.3)}
+.pkey b{font:500 20px var(--f-body,inherit);line-height:1}.pkey small{font-size:8.5px;letter-spacing:.14em;color:#aab3cc;height:9px}
+.p-foot{display:flex;justify-content:center;align-items:center;margin-top:16px;position:relative;min-height:62px}
+.p-end{width:64px;height:64px;border-radius:50%;border:0;background:#ef4444;color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 22px -8px rgba(239,68,68,.8);transition:transform .15s,background .2s}
+.p-end:hover{background:#dc2626}.p-end:active{transform:scale(.93)}
+.p-end i{display:grid;place-items:center}
+.p-hide{position:absolute;left:8px;background:none;border:0;color:#cfd6ea;display:flex;align-items:center;gap:2px;font-size:13px;cursor:pointer}
+.p-home{position:absolute;bottom:6px;left:50%;width:104px;height:4px;border-radius:3px;background:rgba(255,255,255,.55);transform:translateX(-50%)}
+.phone[data-state=ended] .p-end,.phone[data-state=ended] .p-grid{opacity:.35;pointer-events:none}
+/* in-call alert: slides in over the top of the phone and goes away on its own. The call is never interrupted. */
+.p-alert{position:absolute;z-index:6;left:10px;right:10px;top:46px;display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-radius:18px;background:rgba(239,68,68,.96);color:#fff;box-shadow:0 14px 30px -10px rgba(0,0,0,.6);transform:translateY(-130%);opacity:0;transition:transform .45s cubic-bezier(.2,.9,.25,1.1),opacity .3s;pointer-events:none}
+.p-alert.on{transform:none;opacity:1}
+.p-alert[data-level=warn]{background:rgba(245,158,11,.96);color:#241800}
+.p-alert i{flex:none;width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.22);display:grid;place-items:center}
+.p-alert b{display:block;font-size:13px;margin-bottom:2px}.p-alert span{font-size:11.5px;line-height:1.4;display:block}
+@media (prefers-reduced-motion:reduce){.p-ring,.p-guard .gd{animation:none!important}}

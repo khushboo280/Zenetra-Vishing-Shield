@@ -1,0 +1,29 @@
+.tools{position:relative}
+.callbar .tools{margin-left:auto;flex-wrap:wrap}
+.msg .wl{font:700 10.5px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--lane-c);margin-right:7px}
+.msg.caller{border-left:3px solid var(--info)}
+.msg.receiver{border-left:3px solid var(--good)}
+.flow path.e{animation:dash 1.4s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-14}}
+.flow text.t{font-weight:650;font-size:14px}
+.flow text.sub{font-size:11px}
+.kv{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.kv li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
+.kv li i{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;background:var(--accent-soft);color:var(--accent)}
+.kv li i.sim{background:var(--warn-soft);color:var(--warn)}
+.sample-tag{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--fg3);border:1px solid var(--line2);border-radius:6px;padding:0 5px;margin-left:6px}
+.hold-tag{display:inline-flex;gap:6px;align-items:center}
+.sub-h{font:600 12px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--fg3);margin:14px 0 6px}
+.fus-sum{margin-top:10px;font:500 12px var(--f-mono);color:var(--fg2);padding:8px 10px;border-radius:10px;background:var(--surface2);border:1px dashed var(--line2);overflow-wrap:anywhere}
+.fus-sum b{color:var(--fg)}
+.tl-note{font-size:12px;color:var(--fg3);margin-top:6px}
+.empty-note{padding:20px;text-align:center;color:var(--fg3);font-size:14px}
+.pcomp-h{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pcomp-h small{color:var(--fg3);font-size:12.5px}
+.setrow .seg{flex:none}
+.side-foot a{color:var(--accent);font-weight:600}
+.callbar .seg{flex:none}
+.alert-lang{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
+.rep-note{margin:6px 0 0;color:var(--fg2);font-size:14.5px;max-width:62ch}
+.hl-tl{display:flex;gap:8px;align-items:center}
+@media (max-width:900px){.callbar .tools{margin-left:0;width:100%}}

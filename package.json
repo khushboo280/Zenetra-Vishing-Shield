@@ -1,0 +1,33 @@
+{
+  "name": "vishing-shield-live",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Real-time vishing / deepfake-voice call guard: WebRTC + live STT + fraud scoring + live hold/intervene",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"node --watch server/index.js\" \"vite\"",
+    "build": "vite build",
+    "setup": "node scripts/setup.js",
+    "start": "vite build && node server/index.js",
+    "serve": "node server/index.js",
+    "test": "node --test --test-force-exit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "html2pdf.js": "^0.14.0",
+    "qrcode": "^1.5.4",
+    "selfsigned": "^5.5.0",
+    "socket.io": "^4.8.4",
+    "socket.io-client": "^4.8.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
+    "concurrently": "^8.2.2",
+    "vite": "^5.4.0",
+    "ws": "^8.22.0"
+  }
+}
